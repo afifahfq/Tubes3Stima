@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang= "en">
+<head>
+    <meta charset = "UTF-8">
+    <title>Butler-san</title>
+</head>
+<body>
+    <h1>
+        REMINDER BOT
+    </h1>
+    <div id = "message">
+    </div>
+    <form id = "input_message_form">
+        <input type="text" placeholder="Enter your message here" id="input_message"></input>
+        <button type="submit">Send</button>
+    </form>
+</body>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script>
+/*Yang atas tuh HTML biasa
+Yang bawah buat ngurusin chatnya*/
+
+    const socket = io.connect("http://127.0.0.1:5000");
+
+    //ini fungsi jalan setelah socketnya berhasil connect
+    socket.on('connect', function(){
+        //ini fungsi yang ngasih tau main kalo bot sudah connect
+        socket.emit('bot_arrive', {
+            username: "{{ username }}"
+        });
+        //ini fungsi buat nanggulangin submit-an message
+        document.getElementById('input_message_form').onsubmit = function(e){
+            e.preventDefault();
+            message = document.getElementById('input_message').value.trim();
+            if(message.length>0){
+                socket.emit('send_message', {
+                    "username" : "{{username}}",
+                    "user_message" : message
+                })
+            }
+            document.getElementById('input_message').value = "";
+            document.getElementById('input_message').focus();
+        }
+    });
+
+    //ini buat ngepost arrival message ke chat wall
+    socket.on('bot_arrive_message', function(data){
+        alert(data['alert']);
+        newMessage = document.createElement('div');
+        newMessage.innerHTML = "<b>Butler-san</b> : " + data['message'];
+        document.getElementById('message').appendChild(newMessage);
+    })
+
+    //ini buat ngepost user message ke chat wall
+    socket.on('post_user_message', function(data){
+        newMessage = document.createElement('div');
+        newMessage.innerHTML = "<b>"+data['username']+"</b> : " + data['user_message'];
+        document.getElementById('message').appendChild(newMessage);
+        socket.emit('get_bot_message', data)
+    })
+
+    //ini buat ngepost message dari bot setelah diolah dulu
+    socket.on('post_bot_message', function(data){
+        newMessage = document.createElement('div');
+        newMessage.innerHTML = "<b>Butler-san</b> : " + data['bot_message'];
+        document.getElementById('message').appendChild(newMessage);
+        socket.emit('get_message_bot', data)
+    })
+
+</script>
+</html>
