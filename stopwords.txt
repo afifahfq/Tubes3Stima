@@ -18,7 +18,6 @@ amatlah
 anda
 andalah
 antar
-antara
 antaranya
 apa
 apaan
@@ -138,7 +137,6 @@ cukuplah
 cuma
 dahulu
 dalam
-dan
 dapat
 dari
 daripada
@@ -250,7 +248,6 @@ harusnya
 hendak
 hendaklah
 hendaknya
-hingga
 ia
 ialah
 ibarat
@@ -519,7 +516,6 @@ saling
 sama
 sama-sama
 sambil
-sampai
 sampai-sampai
 sampaikan
 sana
@@ -656,6 +652,7 @@ siap
 siapa
 siapakah
 siapapun
+simsimi
 sini
 sinilah
 soal
@@ -674,6 +671,8 @@ tambah
 tambahnya
 tampak
 tampaknya
+tampil
+tampilkan
 tandas
 tandasnya
 tanpa
@@ -728,6 +727,8 @@ tidaklah
 tiga
 tinggi
 toh
+tulis
+tuliskan
 tunjuk
 turut
 tutur

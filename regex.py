@@ -1,5 +1,6 @@
 import re
 import mysql.connector
+from datetime import datetime
 
 mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
 curs = mysqldb.cursor()
@@ -62,8 +63,27 @@ def addTask(tes):
         mysqldb.commit()
         return True
 
+def printTask(query):
+    if (query == "all"):
+        sql = "SELECT * FROM catatan"
+        curs.execute(sql)
+        result = curs.fetchall()
+
+        for data in result:
+            print(data)
+    elif (query == "today"):
+        tgl = datetime.date(datetime.now())
+        
+        sql = "SELECT * FROM catatan WHERE jenis = %s"
+        val = "tubes"
+        curs.execute(sql, val)
+        result = curs.fetchall()
+
+        for data in result:
+            print(data)
+    else :
+        print(type(query))
+        print("wrong")
+    
+
 #print(addTask(text))
-
-
-
-

@@ -53,4 +53,7 @@
 53. Hallo? Hai
 54. Deadline? show-all-deadline
 55. Deadline hari ini? show-today-deadline
-56. pembatas? end
+56. Deadline minggu depan? show-next-week-deadline
+57. Fitur? show-features
+58. Apa saja yang bisa dilakukan SimSimi? show-features
+59. pembatas? end

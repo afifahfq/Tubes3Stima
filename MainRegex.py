@@ -6,6 +6,7 @@ import StringMatching
 import ReadFile
 import itertools
 import sys
+from datetime import datetime
 
 #Baca file faq
 Q, A = ReadFile.read_faq('pertanyaan.txt')
@@ -45,7 +46,7 @@ for question in proc_Q:
     indeks += 1
 
 #Pemanggilan query
-query = input("Masukkan query :")
+query = input("Masukkan query : ")
 keys = keywords.keys()
 candidate_ques_ans = []
 default = "Halo, ada yang bisa dibantu?"
@@ -114,9 +115,25 @@ if len(query) > 0:
                     ans += "-" + q[0] + "\n"
             
             if (ans == "show-all-deadline"):
-                print("program print seluruh deadline")
+                printTask("all")
             elif (ans == "show-today-deadline"):
-                print("program print deadline hari ini")
+                printTask("today")
+            elif (ans == "show-features"):
+                print('''
+                ~ Chatbot : SimSimi ~\n
+                [Fitur]\n
+                1. Menambahkan task baru\n
+                2. Melihat daftar task yang harus dikerjakan\n
+                3. Menampikan deadline dari suatu task tertentu\n
+                4. Memperbarui task tertentu\n
+                5. Menandai bahwa suatu task sudah selesai dikerjakan\n
+                6. Menampilkan opsi help yang difasilitasi oleh assistant\n
+                [Daftar Kata Penting]\n
+                1. Kuis\n
+                2. Ujian\n
+                3. Tucil\n
+                4. Tubes\n
+                5. Praktikum\n''')
             else:
                 print(ans)
 
