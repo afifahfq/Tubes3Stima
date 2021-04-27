@@ -675,6 +675,7 @@ tampil
 tampilkan
 tandas
 tandasnya
+tanggal
 tanpa
 tanya
 tanyakan

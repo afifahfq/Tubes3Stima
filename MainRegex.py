@@ -83,13 +83,13 @@ if len(query) > 0:
                     if (presentase>=0.30):
                         candidate_ques_ans.append((q,A[indeks],presentase))
         
-        #print(regex_query)
-        #print(candidate_ques_ans)
+        print(regex_query)
+        print(candidate_ques_ans)
 
         if (addTask(query) == True):
             print("task added!")
 
-        elif (len(candidate_ques_ans)>0):
+        if (len(candidate_ques_ans)>0):
             high_ans = []     
             low_ans = []
             ans = ""
@@ -113,11 +113,11 @@ if len(query) > 0:
                 ans = "Apa maksud anda : \n"
                 for q in low_ans:
                     ans += "-" + q[0] + "\n"
-            
+
             if (ans == "show-all-deadline"):
-                printTask("all")
+                printTask("all", None)
             elif (ans == "show-today-deadline"):
-                printTask("today")
+                printTask("today", None)
             elif (ans == "show-features"):
                 print('''
                 ~ Chatbot : SimSimi ~\n
@@ -134,11 +134,20 @@ if len(query) > 0:
                 3. Tucil\n
                 4. Tubes\n
                 5. Praktikum\n''')
-            else:
+            elif (len(ans) > 0):
                 print(ans)
 
-
         else:
-            print("Saya tidak mengerti")
+            if (re.findall("deadline", regex_query)):
+                print("masuk!")
+                if (re.findall("minggu", regex_query)):
+                    printTask("week", regex_query)
+                elif (re.findall("hari", regex_query)):
+                    printTask("day", regex_query)
+                else:
+                    printTask("interval", regex_query)
+            else:
+                print("Saya tidak mengerti")
+
     else:
         print("Maaf, saya tidak mengerti")

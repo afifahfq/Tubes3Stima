@@ -1,7 +1,7 @@
 import re
 from time import process_time
 import mysql.connector
-from datetime import datetime
+from datetime import datetime, timedelta
 
 mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
 curs = mysqldb.cursor()
@@ -64,7 +64,7 @@ def addTask(tes):
         mysqldb.commit()
         return True
 
-def printTask(query):
+def printTask(query, arg):
     if (query == "all"):
         sql = "SELECT * FROM catatan"
         curs.execute(sql)
@@ -73,14 +73,104 @@ def printTask(query):
         for data in result:
             print(data)
     elif (query == "today"):
-        tgl = datetime.date(datetime.now())
+        currtgl = datetime.date(datetime.now())
         
-        sql = "SELECT * FROM catatan WHERE jenis = %(tubes)s"
-        curs.execute(sql, {'tubes':'tubes'})
+        sql = "SELECT * FROM catatan WHERE jenis = %(tgl)s"
+        curs.execute(sql, {'tgl':currtgl})
         result = curs.fetchall()
+
+        if (len(result) == 0):
+            print("Tidak ada data yang sesuai")
 
         for data in result:
             print(data)
+    elif (query == "interval"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", " ")
+        arg = arg.split("sampai")
+
+        date1 = convertStrtoDate(arg[0])
+        date1 = date1.replace("/", "-")
+        date2 = convertStrtoDate(arg[1])
+        date2 = date2.replace("/", "-")
+
+        sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+        curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+        result = curs.fetchall()
+
+        if (len(result) == 0):
+            print("Tidak ada data yang sesuai")
+
+        for data in result:
+            print(data)
+    elif (query == "week"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", "")
+
+        if (re.findall("depan", arg)):
+            count = int(arg[arg.find("minggu") - 1])
+
+            date1 = datetime.date(datetime.now())
+            date2 = datetime.date(datetime.now()) + timedelta(days = count * 7)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+            result = curs.fetchall()
+
+            if (len(result) == 0):
+                print("Tidak ada data yang sesuai")
+
+            for data in result:
+                print(data)
+        elif (re.findall("belakang", arg)):
+            count = int(arg[arg.find("minggu") - 1])
+
+            date2 = datetime.date(datetime.now())
+            date1 = datetime.date(datetime.now()) - timedelta(days = count * 7)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+            result = curs.fetchall()
+
+            if (len(result) == 0):
+                print("Tidak ada data yang sesuai")
+
+            for data in result:
+                print(data)
+    elif (query == "day"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", "")
+
+        if (re.findall("depan", arg)):
+            count = int(arg[arg.find("hari") - 1])
+
+            date1 = datetime.date(datetime.now())
+            date2 = datetime.date(datetime.now()) + timedelta(days = count)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+            result = curs.fetchall()
+
+            if (len(result) == 0):
+                print("Tidak ada data yang sesuai")
+
+            for data in result:
+                print(data)
+        elif (re.findall("belakang", arg)):
+            count = int(arg[arg.find("hari") - 1])
+
+            date2 = datetime.date(datetime.now())
+            date1 = datetime.date(datetime.now()) - timedelta(days = count)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+            result = curs.fetchall()
+
+            if (len(result) == 0):
+                print("Tidak ada data yang sesuai")
+
+            for data in result:
+                print(data)
     else :
         print(type(query))
         print("wrong")
@@ -137,6 +227,31 @@ def askDeadline(in_matkul):
 
     for data in result:
         print(data)
+
+def convertStrtoDate(str_tgl):
+    month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
+    patt = '[0-9]{2}[/][0-9]{2}[/][0-9]{4}'
+    patt2 = '[0-9]{2}[-][0-9]{2}[-][0-9]{4}'
+
+    if(re.search(patt,str_tgl)):
+        tanggal = str(str_tgl.split('/'))
+        tanggal_fix=(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+    elif(re.search(patt2,str_tgl)):
+        tanggal = str(str_tgl).split('-')
+        tanggal_fix=(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+    else:
+        tanggal = str(str_tgl).split()
+        bulan = 0
+        for i in range(12):
+            if(tanggal[1]==month[i]):
+                bulan=i+1
+                if(bulan<10):
+                    bulan = '0'+str(bulan)
+                else:
+                    bulan = str(bulan)
+        tanggal_fix=(tanggal[2]+'/'+bulan+'/'+tanggal[0])
+
+    return(tanggal_fix)
 
 #print(addTask(text))
 # printTask(all)
