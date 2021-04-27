@@ -1,32 +1,33 @@
 import re
-#import mysql.connector
+import mysql.connector
 
-
+mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
+curs = mysqldb.cursor()
 text = "Halo tolong dicatat ya matkul IF2230 ada tubes materi string matching 05 april 2021"
 
-def addTask(text):
+def addTask(tes):
+    text = tes.lower()
     arr = []
     month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
     re_matkul = '([a-zA-Z]{2}[0-9]{4})'
     re_jenis = 'kuis|tucil|tubes|ujian|praktikum|rangkuman'
     re_tgl = '[0-9]{2}[/-]?\s?\w+[/-]?\s?[0-9]{4}'
     re_materi = '(materi |tentang |mengenai )+(.*)'
-    x1 = re.findall(re_matkul,text)
+    x1 = re.findall(re_tgl,text)
     if(x1):
-        arr.append(x1[0])
-        text=text.replace(x1[0],"")
-    x2 = re.findall(re_jenis,text)
-    if(x2):
-        arr.append(x2[0])
-        text=text.replace(x2[0],"")
-    x3 = re.findall(re_tgl,text)
-    if(x3):
-        patt = '[0-9]{2}[/-][0-9]{2}[/-][0-9]{4}'
+        #arr.append(x1[0])
+        patt = '[0-9]{2}[/][0-9]{2}[/][0-9]{4}'
+        patt2 = '[0-9]{2}[-][0-9]{2}[-][0-9]{4}'
         if(re.search(patt,text)):
-            arr.append(x3[0])
-            text=text.replace(x3[0],"")
+            tanggal = str(x1[0]).split('/')
+            arr.append(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+            text=text.replace(x1[0],"")
+        elif(re.search(patt2,text)):
+            tanggal = str(x1[0]).split('-')
+            arr.append(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+            text=text.replace(x1[0],"")
         else:
-            tanggal = str(x3[0]).split()
+            tanggal = str(x1[0]).split()
             bulan = 0
             for i in range(12):
                 if(tanggal[1]==month[i]):
@@ -35,18 +36,33 @@ def addTask(text):
                         bulan = '0'+str(bulan)
                     else:
                         bulan = str(bulan)
-            arr.append(tanggal[0]+'/'+bulan+'/'+tanggal[2])
-            text=text.replace(x3[0],"")
+            arr.append(tanggal[2]+'/'+bulan+'/'+tanggal[0])
+            text=text.replace(x1[0],"")
+
+    x2 = re.findall(re_matkul,text)
+    if(x2):
+        arr.append(x2[0])
+        text=text.replace(x2[0],"")
+
+    x3 = re.findall(re_jenis,text)
+    if(x3):
+        arr.append(x3[0])
+        text=text.replace(x3[0],"")
+
     x4 = re.findall(re_materi,text)
     if(x4):
         arr.append(x4[0][1])
+
     if(len(arr)!=4):
         return False
     else :
-        # mau dimasukin database
+        sql = "INSERT INTO catatan (tanggal, matkul, jenis, topik) VALUES(%s,%s,%s,%s)"
+        val = (arr[0],arr[1],arr[2],arr[3])
+        curs.execute(sql,val)
+        mysqldb.commit()
         return True
 
-print(addTask(text))
+#print(addTask(text))
 
 
 
