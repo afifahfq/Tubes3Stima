@@ -1,6 +1,7 @@
 import re
 from Sinonim import get_sinonim
 from FileProcessing import *
+from regex import *
 import StringMatching
 import ReadFile
 import itertools
@@ -84,7 +85,10 @@ if len(query) > 0:
         #print(regex_query)
         #print(candidate_ques_ans)
 
-        if (len(candidate_ques_ans)>0):
+        if (addTask(query) == True):
+            print("task added!")
+
+        elif (len(candidate_ques_ans)>0):
             high_ans = []     
             low_ans = []
             ans = ""
@@ -109,7 +113,6 @@ if len(query) > 0:
                 for q in low_ans:
                     ans += "-" + q[0] + "\n"
             
-            
             if (ans == "show-all-deadline"):
                 print("program print seluruh deadline")
             elif (ans == "show-today-deadline"):
@@ -121,4 +124,4 @@ if len(query) > 0:
         else:
             print("Saya tidak mengerti")
     else:
-        print("Saya tidak mengerti")
+        print("Maaf, saya tidak mengerti")
