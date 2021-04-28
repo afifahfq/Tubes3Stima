@@ -245,7 +245,7 @@ def updateTask(query):
                 if (re.findall(b, query)):
                     indeks = words.index(b) + 1
                     tgl = words[indeks:]
-                    tanggal = '-'.join([elem for elem in tgl])
+                    tanggal = ' '.join([elem for elem in tgl])
                     str_tgl = convertStrtoDate(tanggal)
                     break
 

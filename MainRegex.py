@@ -13,7 +13,7 @@ def printDeadline(result):
     for data in result:
         print(i, ". ", end=" ")
         print("(ID: %d)" %data[0], end=" ")
-        print(data[1].strftime("%Y/%m/%d"), end=" ")
+        print(data[1], end=" ")
         print("-", data[2].upper(), end=" ")
         print("-", data[3].capitalize(), end=" ")
         print("-", data[4].capitalize())
@@ -198,16 +198,20 @@ if len(query) > 0:
             result = []
             while(str(regex_query) != None or status == False):
                 if (foundKeywords(regex_query)):
+                    status = True
                     result = printTask("task", regex_query, None)
                     regex_query = delKeywords(regex_query, "task")
                     if len(result) == 0:
                         break
                 else:
                     if (re.findall("bulan", regex_query)):
+                        status = True
                         result = printTask("month", regex_query, result)
                     elif (re.findall("minggu", regex_query)):
+                        status = True
                         result = printTask("week", regex_query, result)
                     elif (re.findall("hari", regex_query)):
+                        status = True
                         result = printTask("day", regex_query, result)
                     elif (re.findall("task", regex_query) or re.findall("deadline", regex_query) or re.findall("tugas", regex_query)):
                         if (foundInterval(regex_query)):
@@ -223,7 +227,7 @@ if len(query) > 0:
 
                 if (regex_query == None or regex_query == "(.*)deadline(.*)"):
                     break
-
+            
             if (len(result) == 0 and status == True):
                 print("Tidak ada data yang memenuhi")
             elif (status == True):

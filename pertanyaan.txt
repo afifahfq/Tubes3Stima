@@ -52,6 +52,8 @@
 52. selamat siang? selamat siang juga
 53. Hallo? Hai
 54. Deadline? show-all-deadline
+55. Tugas? show-all-deadline
+56. Task? show-all-deadline
 55. Deadline hari ini? show-today-deadline
 56. Deadline minggu depan? show-next-week-deadline
 57. Deadline sampai? show-interval-deadline
