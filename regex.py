@@ -372,6 +372,7 @@ def printDeadline(result):
         print("-", data[2].upper(), end=" ")
         print("-", data[3].capitalize(), end=" ")
         print("-", data[4].capitalize())
+        i += 1
 
 #print(addTask(text))
 # printTask(all)

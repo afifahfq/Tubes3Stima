@@ -6,9 +6,11 @@ import ReadFile
 import itertools
 import sys
 from datetime import datetime
+import levenshtein
 
 #Baca file faq
 Q, A = ReadFile.read_faq('pertanyaan.txt')
+katasubs = ReadFile.read_txt('katasubs.txt')
 
 #Pre-processing tiap pertanyaan
 proc_Q = [remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(question)))) for question in Q]
@@ -152,6 +154,7 @@ if len(query) > 0:
                 pass
 
         else:
+            result = []
             while(str(regex_query) != "(.*)deadline(.*)" or status == False):
                 if (foundKeywords(regex_query)):
                     result = printTask("task", regex_query, None)
@@ -168,13 +171,29 @@ if len(query) > 0:
                     else:
                         if (foundInterval(regex_query)):
                             result = printTask("interval", regex_query, result)
+                            status = True
                         else:
                             result = printTask("date", regex_query, result)
+                            status = True
                     regex_query = delKeywords(regex_query, "deadline")
                     regex_query = "(.*)deadline(.*)"
 
                 if (regex_query == None):
                     break
+
+            query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+            words = query.split()
+            sol = []
+            for w in words:
+                arr = levenshtein.rekomendasi(w, katasubs)
+                if len(arr) != 0:
+                    for i in range(len(arr)):
+                        sol.append(arr[i])
+            
+            if len(sol) != 0:
+                print("Apakah maksud ada : ")
+                for s in sol:
+                    print("-", s)
 
             if (len(result) == 0):
                 print("Tidak ada data yang memenuhi")
@@ -186,4 +205,10 @@ if len(query) > 0:
                 print("Saya tidak mengerti")'''
 
     else:
-        print("Maaf, saya tidak mengerti")
+        query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+        arr = rekomendasi(query, katasubs)
+
+        if len(arr) == 0:
+            print("Maaf, saya tidak mengerti")
+        for i in range(len(arr)):
+            print(arr[i])

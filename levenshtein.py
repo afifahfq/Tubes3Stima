@@ -1,4 +1,5 @@
 import ReadFile
+from FileProcessing import *
 
 def levenshtein(s1, s2):
     if len(s1) < len(s2):
@@ -23,7 +24,6 @@ def bobotleven(kata1, kata2):
     bobot = (1-(dist/maks))
     return bobot
 
-
 def rekomendasi(in_kata, hasil):
     rekomen = []
     for i in range(len(hasil)):
@@ -31,7 +31,12 @@ def rekomendasi(in_kata, hasil):
             rekomen.append(hasil[i])
     return rekomen
 
-# hasil=ReadFile.read_txt('katasubs.txt')
-# arr=rekomendasi('dedline',hasil)
-# for i in range(len(arr)):
-#     print(arr[i])
+'''katasubs = ReadFile.read_txt('katasubs.txt')
+query = input("query : ")
+query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+print(query)
+arr = rekomendasi(query, katasubs)
+if len(arr) == 0:
+    print("ga")
+for i in range(len(arr)):
+    print(arr[i])'''
