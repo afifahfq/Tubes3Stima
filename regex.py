@@ -2,7 +2,7 @@ import re
 from time import process_time
 import mysql.connector
 from datetime import datetime, timedelta
-import FileProcessing
+from FileProcessing import *
 from KMP import *
 
 mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
@@ -52,7 +52,7 @@ def addTask(tes):
     if(x3):
         arr.append(x3[0])
         text=text.replace(x3[0],"")
-
+    text=remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(text))))
     x4 = re.findall(re_materi,text)
     if(x4):
         arr.append(x4[0][1])
@@ -65,8 +65,8 @@ def addTask(tes):
         curs.execute(sql,val)
         mysqldb.commit()
 
-        sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s AND matkul = %(mtk)s AND jenis = %(jns)s AND topik = %(tpk)s"
-        curs.execute(sql, {'tgl':arr[0], 'mtk':arr[1], 'jns':arr[2], 'tpk':arr[3]})
+        sql = "SELECT * FROM catatan WHERE id = (SELECT MAX(id) from catatan)"
+        curs.execute(sql)
         result = curs.fetchall()
 
         return result
@@ -356,6 +356,59 @@ def foundInterval(query):
         return True
     
     return False
+
+def checkAddTask (tes):
+    text = tes.lower()
+    arr = []
+    month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
+    re_matkul = '([a-zA-Z]{2}[0-9]{4})'
+    re_jenis = 'kuis|tucil|tubes|ujian|praktikum|rangkuman'
+    re_tgl = '[0-9]{2}[/-]?\s?\w+[/-]?\s?[0-9]{4}'
+    re_materi = '(materi |tentang |mengenai )+(.*)'
+    x1 = re.findall(re_tgl,text)
+    if(x1):
+        #arr.append(x1[0])
+        patt = '[0-9]{2}[/][0-9]{2}[/][0-9]{4}'
+        patt2 = '[0-9]{2}[-][0-9]{2}[-][0-9]{4}'
+        if(re.search(patt,text)):
+            tanggal = str(x1[0]).split('/')
+            arr.append(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+            text=text.replace(x1[0],"")
+        elif(re.search(patt2,text)):
+            tanggal = str(x1[0]).split('-')
+            arr.append(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+            text=text.replace(x1[0],"")
+        else:
+            tanggal = str(x1[0]).split()
+            bulan = 0
+            for i in range(12):
+                if(tanggal[1]==month[i]):
+                    bulan=i+1
+                    if(bulan<10):
+                        bulan = '0'+str(bulan)
+                    else:
+                        bulan = str(bulan)
+            arr.append(str(tanggal[2])+'/'+str(bulan)+'/'+str(tanggal[0]))
+            text=text.replace(x1[0],"")
+
+    x2 = re.findall(re_matkul,text)
+    if(x2):
+        arr.append(x2[0])
+        text=text.replace(x2[0],"")
+
+    x3 = re.findall(re_jenis,text)
+    if(x3):
+        arr.append(x3[0])
+        text=text.replace(x3[0],"")
+
+    x4 = re.findall(re_materi,text)
+    if(x4):
+        arr.append(x4[0][1])
+
+    if(len(arr)!=4):
+        return None
+    else :
+        return True
 
 #print(addTask(text))
 # printTask(all)

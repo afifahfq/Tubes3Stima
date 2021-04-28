@@ -5,7 +5,7 @@ from regex import *
 import ReadFile
 import itertools
 import sys
-from datetime import datetime
+from datetime import date, datetime
 import levenshtein
 
 def printDeadline(result):
@@ -13,7 +13,8 @@ def printDeadline(result):
     for data in result:
         print(i, ". ", end=" ")
         print("(ID: %d)" %data[0], end=" ")
-        print(data[1], end=" ")
+        tanggal = str(data[1])
+        print(tanggal.replace("-", "/"), end=" ")
         print("-", data[2].upper(), end=" ")
         print("-", data[3].capitalize(), end=" ")
         print("-", data[4].capitalize())
@@ -61,13 +62,13 @@ for question in proc_Q:
 
 #Pemanggilan query
 status = False
-query = input("Masukkan query : ")
+queryasli = input("Masukkan query : ")
 keys = keywords.keys()
 candidate_ques_ans = []
 default = "Halo, ada yang bisa dibantu?"
-if len(query) > 0:
+if len(queryasli) > 0:
     #Pre-processing query
-    proc_query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+    proc_query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(queryasli))))
     proc_query = remove_stopwords(proc_query)
 
     if (len(proc_query)>0):
@@ -101,7 +102,7 @@ if len(query) > 0:
         #print(regex_query)
         #print(candidate_ques_ans)
 
-        query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+        query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(queryasli))))
         words = query.split()
         sol = []
         for w in words:
@@ -122,9 +123,9 @@ if len(query) > 0:
 
             print("Data task berhasil diperbaharui!")
             exit()
-        elif (addTask(query) != None):
+        elif (checkAddTask(queryasli) != None):
             status = True
-            result = addTask(query)
+            result = addTask(queryasli)
 
             print("[TASK BERHASIL DICATAT]")
             printDeadline(result)
