@@ -184,31 +184,30 @@ if len(query) > 0:
                         result = printTask("week", regex_query, result)
                     elif (re.findall("hari", regex_query)):
                         result = printTask("day", regex_query, result)
-                    else:
+                    elif (re.findall("task", regex_query) or re.findall("deadline", regex_query) or re.findall("tugas", regex_query)):
                         if (foundInterval(regex_query)):
                             result = printTask("interval", regex_query, result)
                             status = True
                         else:
                             result = printTask("date", regex_query, result)
                             status = True
+                    else:
+                        print("Saya tidak mengerti")
                     regex_query = delKeywords(regex_query, "deadline")
                     regex_query = None
 
                 if (regex_query == None or regex_query == "(.*)deadline(.*)"):
                     break
 
-            if (len(result) == 0):
+            if (len(result) == 0 and status == True):
                 print("Tidak ada data yang memenuhi")
-            else:
+            elif (status == True):
                 print("\n[Daftar Deadline]")
                 printDeadline(result)
 
-            '''else:
-                print("Saya tidak mengerti")'''
-
     else:
         query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
-        arr = rekomendasi(query, katasubs)
+        arr = levenshtein.rekomendasi(query, katasubs)
 
         if len(arr) == 0:
             print("Maaf, saya tidak mengerti")
