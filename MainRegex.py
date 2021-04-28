@@ -8,6 +8,19 @@ import sys
 from datetime import datetime
 import levenshtein
 
+def printDeadline(result):
+    i = 1
+    for data in result:
+        print(i, ". ", end=" ")
+        print("(ID: %d)" %data[0], end=" ")
+        print(data[1].strftime("%Y/%m/%d"), end=" ")
+        print("-", data[2].upper(), end=" ")
+        print("-", data[3].capitalize(), end=" ")
+        print("-", data[4].capitalize())
+        i += 1
+
+# MAIN PROGRAM
+
 #Baca file faq
 Q, A = ReadFile.read_faq('pertanyaan.txt')
 katasubs = ReadFile.read_txt('katasubs.txt')
@@ -85,8 +98,8 @@ if len(query) > 0:
                     if (presentase>=0.30):
                         candidate_ques_ans.append((q,A[indeks],presentase))
         
-        #print(regex_query)
-        #print(candidate_ques_ans)
+        print(regex_query)
+        print(candidate_ques_ans)
 
         query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
         words = query.split()
@@ -106,15 +119,27 @@ if len(query) > 0:
 
         if (updateTask(query) == True):
             status = True
+
+            print("Data task berhasil diperbaharui!")
             exit()
-        elif (addTask(query) == True):
+        elif (addTask(query) != None):
             status = True
+            result = addTask(query)
+
+            print("[TASK BERHASIL DICATAT]")
+            printDeadline(result)
             exit()
         elif (askDeadline(query) != None):
             status = True
+
+            result = askDeadline(query)
+            for data in result:
+                print(data[1].strftime("%Y/%m/%d"))
             exit()
         elif (deleteTask(query) == True):
             status = True
+
+            print("Task berhasil dihapus!")
             exit()
 
         elif (len(candidate_ques_ans)>0 and status == False):

@@ -58,7 +58,7 @@ def addTask(tes):
         arr.append(x4[0][1])
 
     if(len(arr)!=4):
-        return False
+        return None
     else :
         sql = "INSERT INTO catatan (tanggal, matkul, jenis, topik) VALUES(%s,%s,%s,%s)"
         val = (arr[0],arr[1],arr[2],arr[3])
@@ -69,10 +69,7 @@ def addTask(tes):
         curs.execute(sql, {'tgl':arr[0], 'mtk':arr[1], 'jns':arr[2], 'tpk':arr[3]})
         result = curs.fetchall()
 
-        print("[TASK BERHASIL DICATAT]")
-        printDeadline(result)
-
-        return True
+        return result
 
 def printTask(query, arg, result):
     if (query == "all"):
@@ -207,8 +204,8 @@ def printTask(query, arg, result):
         result = curs.fetchall()
 
         return result
-    '''else :
-        print("[ERROR] Wrong query") '''
+
+    return None
     
 def deleteTask(query):
     keywords = ["sudah", "selesai", "hapus"]
@@ -226,17 +223,16 @@ def deleteTask(query):
             result = curs.fetchall()
 
             if (len(result) == 0):
-                print("Tidak ada data yang sesuai")
+                return None
             else:
                 sql = "DELETE FROM catatan WHERE id = %(id)s"
                 curs.execute(sql, {'id':in_id})
                 mysqldb.commit()
 
-                print("Task berhasil dihapus!")
                 return True
                 
             return True
-    return False
+    return None
 
 def updateTask(query):
     keywords = ["dirubah", "diubah", "ubah", "berubah", "menjadi", "diundur", "undur", "dimajukan", "maju", "delay"]
@@ -263,9 +259,8 @@ def updateTask(query):
             curs.execute(sqlupdate,val)
             mysqldb.commit()
 
-            print("Data task berhasil diperbaharui!")
             return True
-    return False
+    return None
 
 def askDeadline(query):
     keywords = ["kapan", "kapankah"]
@@ -286,10 +281,7 @@ def askDeadline(query):
                 curs.execute(sql, {'mtk':matkul[0]})
                 result = curs.fetchall()
 
-            for data in result:
-                print(data[1].strftime("%Y/%m/%d"))
-
-            return True
+            return result
         else:
             return None
 
@@ -364,17 +356,6 @@ def foundInterval(query):
         return True
     
     return False
-
-def printDeadline(result):
-    i = 1
-    for data in result:
-        print(i, ". ", end=" ")
-        print("(ID: %d)" %data[0], end=" ")
-        print(data[1].strftime("%Y/%m/%d"), end=" ")
-        print("-", data[2].upper(), end=" ")
-        print("-", data[3].capitalize(), end=" ")
-        print("-", data[4].capitalize())
-        i += 1
 
 #print(addTask(text))
 # printTask(all)
