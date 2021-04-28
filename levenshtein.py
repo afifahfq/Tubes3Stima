@@ -27,7 +27,7 @@ def bobotleven(kata1, kata2):
 def rekomendasi(in_kata, hasil):
     rekomen = []
     for i in range(len(hasil)):
-        if(bobotleven(in_kata,hasil[i])>0.75):
+        if(1>bobotleven(in_kata,hasil[i])>0.75):
             rekomen.append(hasil[i])
     return rekomen
 
