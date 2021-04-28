@@ -2,7 +2,8 @@
 
 from flask import Flask, url_for, render_template, request,  redirect
 from flask_socketio import SocketIO
-from chatbot import *
+from MainRegex import *
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -32,6 +33,7 @@ def handle_send_message(data):
 def handle_get_bot_message(data):
     print(data)
     bot_message = getBotMessage(data['user_message'])
+    print(bot_message)
     socketio.emit('post_bot_message', {"bot_message":bot_message})
 
 #ini buat render setelah user masukin nama
