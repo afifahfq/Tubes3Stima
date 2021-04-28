@@ -2,7 +2,6 @@ import re
 from Sinonim import get_sinonim
 from FileProcessing import *
 from regex import *
-import StringMatching
 import ReadFile
 import itertools
 import sys
@@ -83,8 +82,8 @@ if len(query) > 0:
                     if (presentase>=0.30):
                         candidate_ques_ans.append((q,A[indeks],presentase))
         
-        print(regex_query)
-        print(candidate_ques_ans)
+        #print(regex_query)
+        #print(candidate_ques_ans)
 
         if (addTask(query) == True):
             print("task added!")
@@ -138,16 +137,37 @@ if len(query) > 0:
                 print(ans)
 
         else:
-            if (re.findall("deadline", regex_query)):
-                print("masuk!")
-                if (re.findall("minggu", regex_query)):
-                    printTask("week", regex_query)
-                elif (re.findall("hari", regex_query)):
-                    printTask("day", regex_query)
+            while(str(regex_query) != "(.*)deadline(.*)"):
+                if (foundKeywords(regex_query)):
+                    result = printTask("task", regex_query, None)
+                    regex_query = delKeywords(regex_query, "task")
+                    if len(result) == 0:
+                        break
                 else:
-                    printTask("interval", regex_query)
+                    if (re.findall("bulan", regex_query)):
+                        result = printTask("month", regex_query, result)
+                    elif (re.findall("minggu", regex_query)):
+                        result = printTask("week", regex_query, result)
+                    elif (re.findall("hari", regex_query)):
+                        result = printTask("day", regex_query, result)
+                    else:
+                        if (foundInterval(regex_query)):
+                            result = printTask("interval", regex_query, result)
+                        else:
+                            result = printTask("date", regex_query, result)
+                    regex_query = delKeywords(regex_query, "deadline")
+                    regex_query = "(.*)deadline(.*)"
+
+                if (regex_query == None):
+                    break
+
+            if (len(result) == 0):
+                print("Tidak ada data yang memenuhi")
             else:
-                print("Saya tidak mengerti")
+                printDeadline(result)
+
+            '''else:
+                print("Saya tidak mengerti")'''
 
     else:
         print("Maaf, saya tidak mengerti")

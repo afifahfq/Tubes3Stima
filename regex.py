@@ -64,26 +64,33 @@ def addTask(tes):
         mysqldb.commit()
         return True
 
-def printTask(query, arg):
+def printTask(query, arg, result):
     if (query == "all"):
         sql = "SELECT * FROM catatan"
         curs.execute(sql)
         result = curs.fetchall()
 
-        for data in result:
-            print(data)
+        return result
     elif (query == "today"):
         currtgl = datetime.date(datetime.now())
         
-        sql = "SELECT * FROM catatan WHERE jenis = %(tgl)s"
+        sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s"
         curs.execute(sql, {'tgl':currtgl})
         result = curs.fetchall()
 
-        if (len(result) == 0):
-            print("Tidak ada data yang sesuai")
+        return result
+    elif (query == "date"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", " ")
 
-        for data in result:
-            print(data)
+        print("ayo : ", arg)
+        currtgl = convertStrtoDate(arg)
+        
+        sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s"
+        curs.execute(sql, {'tgl':currtgl})
+        result = curs.fetchall()
+
+        return result
     elif (query == "interval"):
         arg = arg[12:]
         arg = arg.replace("(.*)", " ")
@@ -98,11 +105,33 @@ def printTask(query, arg):
         curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
         result = curs.fetchall()
 
-        if (len(result) == 0):
-            print("Tidak ada data yang sesuai")
+        return result
+    elif (query == "month"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", "")
 
-        for data in result:
-            print(data)
+        if (re.findall("depan", arg)):
+            count = int(arg[arg.find("bulan") - 1])
+
+            date1 = datetime.date(datetime.now())
+            date2 = date1.replace(month=date1.month + 1)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
+            result = curs.fetchall()
+
+            return result
+        elif (re.findall("belakang", arg)):
+            count = int(arg[arg.find("bulan") - 1])
+
+            date1 = datetime.date(datetime.now())
+            date2 = date1.replace(month=date1.month - 1)
+
+            sql = "SELECT * FROM catatan WHERE tanggal BETWEEN CAST(%(tgl1)s AS DATE) AND CAST(%(tgl2)s AS DATE)"
+            curs.execute(sql, {'tgl1':date2, 'tgl2':date1})
+            result = curs.fetchall()
+
+            return result
     elif (query == "week"):
         arg = arg[12:]
         arg = arg.replace("(.*)", "")
@@ -117,11 +146,7 @@ def printTask(query, arg):
             curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
             result = curs.fetchall()
 
-            if (len(result) == 0):
-                print("Tidak ada data yang sesuai")
-
-            for data in result:
-                print(data)
+            return result
         elif (re.findall("belakang", arg)):
             count = int(arg[arg.find("minggu") - 1])
 
@@ -132,11 +157,7 @@ def printTask(query, arg):
             curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
             result = curs.fetchall()
 
-            if (len(result) == 0):
-                print("Tidak ada data yang sesuai")
-
-            for data in result:
-                print(data)
+            return result
     elif (query == "day"):
         arg = arg[12:]
         arg = arg.replace("(.*)", "")
@@ -151,11 +172,7 @@ def printTask(query, arg):
             curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
             result = curs.fetchall()
 
-            if (len(result) == 0):
-                print("Tidak ada data yang sesuai")
-
-            for data in result:
-                print(data)
+            return result
         elif (re.findall("belakang", arg)):
             count = int(arg[arg.find("hari") - 1])
 
@@ -166,11 +183,22 @@ def printTask(query, arg):
             curs.execute(sql, {'tgl1':date1, 'tgl2':date2})
             result = curs.fetchall()
 
-            if (len(result) == 0):
-                print("Tidak ada data yang sesuai")
+            return result
+    elif (query == "task"):
+        arg = arg[12:]
+        arg = arg.replace("(.*)", "")
+        
+        keywords = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
+        for k in keywords:
+            if (k in arg):
+                jenis = k
+                break
 
-            for data in result:
-                print(data)
+        sql = "SELECT * FROM catatan WHERE jenis = %(jns)s"
+        curs.execute(sql, {'jns':jenis})
+        result = curs.fetchall()
+
+        return result
     else :
         print(type(query))
         print("wrong")
@@ -252,6 +280,65 @@ def convertStrtoDate(str_tgl):
         tanggal_fix=(tanggal[2]+'/'+bulan+'/'+tanggal[0])
 
     return(tanggal_fix)
+
+def foundKeywords(query):
+    keywords = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
+    for k in keywords:
+        if (k in query):
+            return True
+    return False
+
+def delKeywords(query, currkey):
+    keywords = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
+    
+    if (currkey == "deadline") and (re.findall(currkey, query)):
+        query = query.replace("(.*)deadline", "")
+        return query
+    elif (currkey == "task"):
+        for k in keywords:
+            if (re.findall(k, query)):
+                query = query.replace("(.*)%s" %k, "")
+                return query
+    else:
+        return None
+
+def foundInterval(query):
+    month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
+    re_tgl = '[0-9]{2}[/-]?\s?\w+[/-]?\s?[0-9]{4}'
+
+    tglcheck = re.findall(re_tgl,query)
+    if len(tglcheck) >= 2 :
+        return True
+
+    ycheck = re.findall('[0-9]{4}',query)
+    if len(ycheck) >=2:
+        return True
+
+    mcount = 0
+    for m in month:
+        if (m in query):
+            mcount += 1
+    if mcount >= 2:
+        return True
+
+    query = query.replace(ycheck[0], "")
+    dcheck = re.findall('[0-9]{2}',query)
+    if len(dcheck) >=2:
+        return True
+    
+    return False
+
+def printDeadline(result):
+    print("\n[Daftar Deadline]")
+
+    i = 1
+    for data in result:
+        print(i, ". ", end=" ")
+        print("(ID: %d)" %data[0], end=" ")
+        print(data[1].strftime("%Y/%m/%d"), end=" ")
+        print("-", data[2].upper(), end=" ")
+        print("-", data[3].capitalize(), end=" ")
+        print("-", data[4].capitalize())
 
 #print(addTask(text))
 # printTask(all)
