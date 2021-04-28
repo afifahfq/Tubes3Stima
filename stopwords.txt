@@ -62,7 +62,6 @@ begitukah
 begitulah
 begitupun
 bekerja
-belakang
 belakangan
 belum
 belumlah
@@ -127,7 +126,6 @@ bukan
 bukankah
 bukanlah
 bukannya
-bulan
 bung
 cara
 caranya
@@ -146,7 +144,6 @@ demi
 demikian
 demikianlah
 dengan
-depan
 di
 dia
 diakhiri
@@ -675,6 +672,7 @@ tampil
 tampilkan
 tandas
 tandasnya
+tanggal
 tanpa
 tanya
 tanyakan

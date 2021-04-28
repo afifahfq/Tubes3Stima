@@ -2,7 +2,6 @@ import re
 from Sinonim import get_sinonim
 from FileProcessing import *
 from regex import *
-import StringMatching
 import ReadFile
 import itertools
 import sys
@@ -87,9 +86,9 @@ if len(query) > 0:
         #print(candidate_ques_ans)
 
         if (addTask(query) == True):
-            print("task added!")
-
-        elif (len(candidate_ques_ans)>0):
+            quit()
+        
+        if (len(candidate_ques_ans)>0):
             high_ans = []     
             low_ans = []
             ans = ""
@@ -113,11 +112,13 @@ if len(query) > 0:
                 ans = "Apa maksud anda : \n"
                 for q in low_ans:
                     ans += "-" + q[0] + "\n"
-            
+
             if (ans == "show-all-deadline"):
-                printTask("all")
+                result = printTask("all", None, None)
+                printDeadline(result)
             elif (ans == "show-today-deadline"):
-                printTask("today")
+                result = printTask("today", None, None)
+                printDeadline(result)
             elif (ans == "show-features"):
                 print('''
                 ~ Chatbot : SimSimi ~\n
@@ -134,11 +135,42 @@ if len(query) > 0:
                 3. Tucil\n
                 4. Tubes\n
                 5. Praktikum\n''')
-            else:
+            elif (len(ans) > 0):
                 print(ans)
 
-
         else:
-            print("Saya tidak mengerti")
+            while(str(regex_query) != "(.*)deadline(.*)"):
+                if (foundKeywords(regex_query)):
+                    result = printTask("task", regex_query, None)
+                    regex_query = delKeywords(regex_query, "task")
+                    if len(result) == 0:
+                        break
+                else:
+                    if (re.findall("bulan", regex_query)):
+                        result = printTask("month", regex_query, result)
+                    elif (re.findall("minggu", regex_query)):
+                        result = printTask("week", regex_query, result)
+                    elif (re.findall("hari", regex_query)):
+                        result = printTask("day", regex_query, result)
+                    else:
+                        if (foundInterval(regex_query)):
+                            result = printTask("interval", regex_query, result)
+                        else:
+                            result = printTask("date", regex_query, result)
+                    regex_query = delKeywords(regex_query, "deadline")
+                    regex_query = "(.*)deadline(.*)"
+
+                if (regex_query == None):
+                    break
+
+            if (len(result) == 0):
+                print("Tidak ada data yang memenuhi")
+            else:
+                print("\n[Daftar Deadline]")
+                printDeadline(result)
+
+            '''else:
+                print("Saya tidak mengerti")'''
+
     else:
         print("Maaf, saya tidak mengerti")
