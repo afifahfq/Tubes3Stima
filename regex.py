@@ -40,7 +40,7 @@ def addTask(tes):
                         bulan = '0'+str(bulan)
                     else:
                         bulan = str(bulan)
-            arr.append(tanggal[2]+'/'+bulan+'/'+tanggal[0])
+            arr.append(str(tanggal[2])+'/'+str(bulan)+'/'+str(tanggal[0]))
             text=text.replace(x1[0],"")
 
     x2 = re.findall(re_matkul,text)
@@ -90,8 +90,8 @@ def printTask(query, arg, result):
 
         return result
     elif (query == "date"):
-        arg = arg[12:]
         arg = arg.replace("(.*)", " ")
+        arg = arg.replace("deadline", "")
 
         currtgl = convertStrtoDate(arg)
         
@@ -265,7 +265,6 @@ def updateTask(query):
 
             print("Data task berhasil diperbaharui!")
             return True
-    print("Tidak ada data yang sesuai")
     return False
 
 def askDeadline(query):
@@ -286,9 +285,6 @@ def askDeadline(query):
                 sql = "SELECT * FROM catatan WHERE matkul=%(mtk)s and (jenis='tucil'or jenis='tubes')"
                 curs.execute(sql, {'mtk':matkul[0]})
                 result = curs.fetchall()
-
-            if len(result) == 0:
-                print("Tidak ada data yang sesuai")
 
             for data in result:
                 print(data[1].strftime("%Y/%m/%d"))
