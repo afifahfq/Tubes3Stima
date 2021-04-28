@@ -86,8 +86,8 @@ if len(query) > 0:
         #print(candidate_ques_ans)
 
         if (addTask(query) == True):
-            print("task added!")
-
+            quit()
+        
         if (len(candidate_ques_ans)>0):
             high_ans = []     
             low_ans = []
@@ -114,9 +114,11 @@ if len(query) > 0:
                     ans += "-" + q[0] + "\n"
 
             if (ans == "show-all-deadline"):
-                printTask("all", None)
+                result = printTask("all", None, None)
+                printDeadline(result)
             elif (ans == "show-today-deadline"):
-                printTask("today", None)
+                result = printTask("today", None, None)
+                printDeadline(result)
             elif (ans == "show-features"):
                 print('''
                 ~ Chatbot : SimSimi ~\n
@@ -164,6 +166,7 @@ if len(query) > 0:
             if (len(result) == 0):
                 print("Tidak ada data yang memenuhi")
             else:
+                print("\n[Daftar Deadline]")
                 printDeadline(result)
 
             '''else:

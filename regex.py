@@ -62,6 +62,16 @@ def addTask(tes):
         val = (arr[0],arr[1],arr[2],arr[3])
         curs.execute(sql,val)
         mysqldb.commit()
+        result = curs.fetchall()
+        print(result)
+
+        sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s AND matkul = %(mtk)s AND jenis = %(jns)s AND topik = %(tpk)s"
+        curs.execute(sql, {'tgl':arr[0], 'mtk':arr[1], 'jns':arr[2], 'tpk':arr[3]})
+        result = curs.fetchall()
+
+        print("[TASK BERHASIL DICATAT]")
+        printDeadline(result)
+
         return True
 
 def printTask(query, arg, result):
@@ -199,9 +209,8 @@ def printTask(query, arg, result):
         result = curs.fetchall()
 
         return result
-    else :
-        print(type(query))
-        print("wrong")
+    '''else :
+        print("[ERROR] Wrong query") '''
     
 def deleteTask(in_id):
     sqlid = "SELECT id from catatan where id=%(id)s"
@@ -329,8 +338,6 @@ def foundInterval(query):
     return False
 
 def printDeadline(result):
-    print("\n[Daftar Deadline]")
-
     i = 1
     for data in result:
         print(i, ". ", end=" ")
