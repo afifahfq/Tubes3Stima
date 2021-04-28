@@ -64,7 +64,6 @@ def addTask(tes):
         val = (arr[0],arr[1],arr[2],arr[3])
         curs.execute(sql,val)
         mysqldb.commit()
-        result = curs.fetchall()
 
         sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s AND matkul = %(mtk)s AND jenis = %(jns)s AND topik = %(tpk)s"
         curs.execute(sql, {'tgl':arr[0], 'mtk':arr[1], 'jns':arr[2], 'tpk':arr[3]})
@@ -143,7 +142,6 @@ def printTask(query, arg, result):
 
             return result
     elif (query == "week"):
-        arg = arg[12:]
         arg = arg.replace("(.*)", "")
 
         if (re.findall("depan", arg)):
@@ -233,6 +231,8 @@ def deleteTask(query):
                 sql = "DELETE FROM catatan WHERE id = %(id)s"
                 curs.execute(sql, {'id':in_id})
                 mysqldb.commit()
+
+                print("Task berhasil dihapus!")
                 return True
                 
             return True
@@ -246,10 +246,10 @@ def updateTask(query):
 
             batas = ["ke", "menjadi", "jadi"]
             for b in batas:
-                if (words.index(b) != -1):
+                if (re.findall(b, query)):
                     indeks = words.index(b) + 1
                     tgl = words[indeks:]
-                    tanggal = ' '.join([elem for elem in tgl])
+                    tanggal = '-'.join([elem for elem in tgl])
                     str_tgl = convertStrtoDate(tanggal)
                     break
 
@@ -263,8 +263,9 @@ def updateTask(query):
             curs.execute(sqlupdate,val)
             mysqldb.commit()
 
+            print("Data task berhasil diperbaharui!")
             return True
-            
+    print("Tidak ada data yang sesuai")
     return False
 
 def askDeadline(query):
@@ -276,10 +277,15 @@ def askDeadline(query):
 
             re_jenis = 'tucil|tubes'
             jenis = re.findall(re_jenis,query)
-
-            sql = "SELECT * FROM catatan WHERE matkul=%(mtk)s and jenis=%(jns)s"
-            curs.execute(sql, {'mtk':matkul[0], 'jns':jenis[0]})
-            result = curs.fetchall()
+            
+            if(len(jenis)==1):
+                sql = "SELECT * FROM catatan WHERE matkul=%(mtk)s and jenis=%(jns)s"
+                curs.execute(sql, {'mtk':matkul[0], 'jns':jenis[0]})
+                result = curs.fetchall()
+            else:
+                sql = "SELECT * FROM catatan WHERE matkul=%(mtk)s and (jenis='tucil'or jenis='tubes')"
+                curs.execute(sql, {'mtk':matkul[0]})
+                result = curs.fetchall()
 
             if len(result) == 0:
                 print("Tidak ada data yang sesuai")
@@ -312,7 +318,7 @@ def convertStrtoDate(str_tgl):
                     bulan = '0'+str(bulan)
                 else:
                     bulan = str(bulan)
-        tanggal_fix=(tanggal[2]+'/'+bulan+'/'+tanggal[0])
+        tanggal_fix=(str(tanggal[2])+'/'+str(bulan)+'/'+str(tanggal[0]))
 
     return(tanggal_fix)
 

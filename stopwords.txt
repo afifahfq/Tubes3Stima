@@ -262,7 +262,6 @@ inilah
 itu
 itukah
 itulah
-jadi
 jadilah
 jadinya
 jangan
@@ -300,7 +299,6 @@ kata
 katakan
 katakanlah
 katanya
-ke
 keadaan
 kebetulan
 kecil
@@ -426,7 +424,6 @@ mengira
 mengucapkan
 mengucapkannya
 mengungkapkan
-menjadi
 menjawab
 menjelaskan
 menuju

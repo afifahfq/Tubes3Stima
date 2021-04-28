@@ -47,6 +47,7 @@ for question in proc_Q:
     indeks += 1
 
 #Pemanggilan query
+status = False
 query = input("Masukkan query : ")
 keys = keywords.keys()
 candidate_ques_ans = []
@@ -87,21 +88,36 @@ if len(query) > 0:
         #print(regex_query)
         #print(candidate_ques_ans)
 
-        status = False
-        if (addTask(query) == True):
+        query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
+        words = query.split()
+        sol = []
+        for w in words:
+            arr = levenshtein.rekomendasi(w, katasubs)
+            if len(arr) != 0:
+                for i in range(len(arr)):
+                    sol.append(arr[i])
+            
+        if len(sol) != 0:
+            print("Apakah maksud ada : ")
+            for s in sol:
+                print("-", s)
+            status = True
+            exit()
+
+        if (updateTask(query) == True):
+            status = True
+            exit()
+        elif (addTask(query) == True):
             status = True
             exit()
         elif (askDeadline(query) != None):
-            status = True
-            exit()
-        elif (updateTask(query) == True):
             status = True
             exit()
         elif (deleteTask(query) == True):
             status = True
             exit()
 
-        elif (len(candidate_ques_ans)>0):
+        elif (len(candidate_ques_ans)>0 and status == False):
             high_ans = []     
             low_ans = []
             ans = ""
@@ -155,7 +171,7 @@ if len(query) > 0:
 
         else:
             result = []
-            while(str(regex_query) != "(.*)deadline(.*)" or status == False):
+            while(str(regex_query) != None or status == False):
                 if (foundKeywords(regex_query)):
                     result = printTask("task", regex_query, None)
                     regex_query = delKeywords(regex_query, "task")
@@ -176,24 +192,10 @@ if len(query) > 0:
                             result = printTask("date", regex_query, result)
                             status = True
                     regex_query = delKeywords(regex_query, "deadline")
-                    regex_query = "(.*)deadline(.*)"
+                    regex_query = None
 
                 if (regex_query == None or regex_query == "(.*)deadline(.*)"):
                     break
-
-            query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
-            words = query.split()
-            sol = []
-            for w in words:
-                arr = levenshtein.rekomendasi(w, katasubs)
-                if len(arr) != 0:
-                    for i in range(len(arr)):
-                        sol.append(arr[i])
-            
-            if len(sol) != 0:
-                print("Apakah maksud ada : ")
-                for s in sol:
-                    print("-", s)
 
             if (len(result) == 0):
                 print("Tidak ada data yang memenuhi")
