@@ -85,10 +85,21 @@ if len(query) > 0:
         #print(regex_query)
         #print(candidate_ques_ans)
 
+        status = False
         if (addTask(query) == True):
-            quit()
-        
-        if (len(candidate_ques_ans)>0):
+            status = True
+            exit()
+        elif (askDeadline(query) != None):
+            status = True
+            exit()
+        elif (updateTask(query) == True):
+            status = True
+            exit()
+        elif (deleteTask(query) == True):
+            status = True
+            exit()
+
+        elif (len(candidate_ques_ans)>0):
             high_ans = []     
             low_ans = []
             ans = ""
@@ -135,11 +146,13 @@ if len(query) > 0:
                 3. Tucil\n
                 4. Tubes\n
                 5. Praktikum\n''')
-            elif (len(ans) > 0):
+            elif (len(ans) > 0 and status == False):
                 print(ans)
+            else:
+                pass
 
         else:
-            while(str(regex_query) != "(.*)deadline(.*)"):
+            while(str(regex_query) != "(.*)deadline(.*)" or status == False):
                 if (foundKeywords(regex_query)):
                     result = printTask("task", regex_query, None)
                     regex_query = delKeywords(regex_query, "task")

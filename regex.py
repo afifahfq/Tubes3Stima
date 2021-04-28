@@ -2,6 +2,7 @@ import re
 from time import process_time
 import mysql.connector
 from datetime import datetime, timedelta
+import FileProcessing
 
 mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
 curs = mysqldb.cursor()
@@ -93,7 +94,6 @@ def printTask(query, arg, result):
         arg = arg[12:]
         arg = arg.replace("(.*)", " ")
 
-        print("ayo : ", arg)
         currtgl = convertStrtoDate(arg)
         
         sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s"
@@ -212,58 +212,84 @@ def printTask(query, arg, result):
     '''else :
         print("[ERROR] Wrong query") '''
     
-def deleteTask(in_id):
-    sqlid = "SELECT id from catatan where id=%(id)s"
-    curs.execute(sqlid,{'id' : in_id})
-    result = curs.fetchall()
-    if(len(result)!=0):
-        sql = "DELETE FROM catatan WHERE id = %(id)s"
-        curs.execute(sql, {'id':in_id})
-        mysqldb.commit()
-        return True
-    else:
-        return False
+def deleteTask(query):
+    keywords = ["sudah", "selesai", "hapus"]
+    for k in keywords:
+        if (re.findall(k,query)):
+            words = query.split()
 
-def updateTask(in_id, in_tanggal):
-    month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
-    patt = '[0-9]{2}[/][0-9]{2}[/][0-9]{4}'
-    patt2 = '[0-9]{2}[-][0-9]{2}[-][0-9]{4}'
-    sqlid = "SELECT id from catatan where id=%(id)s"
-    curs.execute(sqlid,{'id' : in_id})
-    result = curs.fetchall()
-    if(len(result)!=0):
-        if(re.search(patt,in_tanggal)):
-            tanggal = str(in_tanggal).split('/')
-            tanggal_fix=(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
-        elif(re.search(patt2,in_tanggal)):
-            tanggal = str(in_tanggal).split('-')
-            tanggal_fix=(tanggal[2]+'/'+tanggal[1]+'/'+tanggal[0])
+            for w in words:
+                if (re.findall('[0-9]{1}|[0-9]{2}', w)):
+                    in_id = w
+                    break
+
+            sqlid = "SELECT id from catatan where id=%(id)s"
+            curs.execute(sqlid,{'id' : in_id})
+            result = curs.fetchall()
+
+            if (len(result) == 0):
+                print("Tidak ada data yang sesuai")
+            else:
+                sql = "DELETE FROM catatan WHERE id = %(id)s"
+                curs.execute(sql, {'id':in_id})
+                mysqldb.commit()
+                return True
+                
+            return True
+    return False
+
+def updateTask(query):
+    keywords = ["dirubah", "diubah", "ubah", "berubah", "menjadi", "diundur", "undur", "dimajukan", "maju", "delay"]
+    for k in keywords:
+        if (re.findall(k,query)):
+            words = query.split()
+
+            batas = ["ke", "menjadi", "jadi"]
+            for b in batas:
+                if (words.index(b) != -1):
+                    indeks = words.index(b) + 1
+                    tgl = words[indeks:]
+                    tanggal = ' '.join([elem for elem in tgl])
+                    str_tgl = convertStrtoDate(tanggal)
+                    break
+
+            new = [x for x in words if x not in tgl]
+            for n in new:
+                if (re.findall('[0-9]{1}|[0-9]{2}', n)):
+                    in_id = n
+
+            sqlupdate = 'UPDATE catatan SET tanggal = %s WHERE id = %s'
+            val = (str_tgl,in_id)
+            curs.execute(sqlupdate,val)
+            mysqldb.commit()
+
+            return True
+            
+    return False
+
+def askDeadline(query):
+    keywords = ["kapan", "kapankah"]
+    for k in keywords:
+        if (re.findall(k,query)):
+            re_matkul = '([a-zA-Z]{2}[0-9]{4})'
+            matkul = re.findall(re_matkul,query)
+
+            re_jenis = 'tucil|tubes'
+            jenis = re.findall(re_jenis,query)
+
+            sql = "SELECT * FROM catatan WHERE matkul=%(mtk)s and jenis=%(jns)s"
+            curs.execute(sql, {'mtk':matkul[0], 'jns':jenis[0]})
+            result = curs.fetchall()
+
+            if len(result) == 0:
+                print("Tidak ada data yang sesuai")
+
+            for data in result:
+                print(data[1].strftime("%Y/%m/%d"))
+
+            return True
         else:
-            tanggal = str(in_tanggal).split()
-            bulan = 0
-            for i in range(12):
-                if(tanggal[1]==month[i]):
-                    bulan=i+1
-                    if(bulan<10):
-                        bulan = '0'+str(bulan)
-                    else:
-                        bulan = str(bulan)
-            tanggal_fix=(tanggal[2]+'/'+bulan+'/'+tanggal[0])
-        sqlupdate = 'UPDATE catatan SET tanggal = %s WHERE id = %s'
-        val = (tanggal_fix,in_id)
-        curs.execute(sqlupdate,val)
-        mysqldb.commit()
-        return True
-    else:
-        return False
-
-def askDeadline(in_matkul):
-    sql = "SELECT * FROM catatan WHERE matkul=%(matkul)s and (jenis='tubes' or jenis='tucil')"
-    curs.execute(sql, {'matkul':in_matkul})
-    result = curs.fetchall()
-
-    for data in result:
-        print(data)
+            return None
 
 def convertStrtoDate(str_tgl):
     month = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember']
