@@ -98,8 +98,8 @@ if len(query) > 0:
                     if (presentase>=0.30):
                         candidate_ques_ans.append((q,A[indeks],presentase))
         
-        print(regex_query)
-        print(candidate_ques_ans)
+        #print(regex_query)
+        #print(candidate_ques_ans)
 
         query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))
         words = query.split()
