@@ -64,7 +64,6 @@ def addTask(tes):
         curs.execute(sql,val)
         mysqldb.commit()
         result = curs.fetchall()
-        print(result)
 
         sql = "SELECT * FROM catatan WHERE tanggal = %(tgl)s AND matkul = %(mtk)s AND jenis = %(jns)s AND topik = %(tpk)s"
         curs.execute(sql, {'tgl':arr[0], 'mtk':arr[1], 'jns':arr[2], 'tpk':arr[3]})

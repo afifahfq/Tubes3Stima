@@ -675,6 +675,7 @@ tanpa
 tanya
 tanyakan
 tanyanya
+task
 tapi
 tegas
 tegasnya
