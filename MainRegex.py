@@ -178,7 +178,7 @@ if len(query) > 0:
                     regex_query = delKeywords(regex_query, "deadline")
                     regex_query = "(.*)deadline(.*)"
 
-                if (regex_query == None):
+                if (regex_query == None or regex_query == "(.*)deadline(.*)"):
                     break
 
             query = remove_nwhitespace(remove_stopwords(remove_noise(to_lowercase(query))))

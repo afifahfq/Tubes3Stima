@@ -3,6 +3,7 @@ from time import process_time
 import mysql.connector
 from datetime import datetime, timedelta
 import FileProcessing
+from KMP import *
 
 mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
 curs = mysqldb.cursor()
@@ -199,7 +200,7 @@ def printTask(query, arg, result):
         
         keywords = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
         for k in keywords:
-            if (k in arg):
+            if (KMPSearch(k, arg) != None):
                 jenis = k
                 break
 

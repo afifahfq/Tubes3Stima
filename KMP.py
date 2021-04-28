@@ -20,9 +20,10 @@ def KMPSearch(pattern, txt):
             maks = max(count, maks)
 
         if j == M:
-            print ("Found pattern at index " + str(i-j))
             j = lps[j-1]
             count = j
+            #print ("Found pattern at index " + str(i-j))
+            return (i-j)
         elif i < N and pattern[j] != txt[i]:
             if j != 0:
                 j = lps[j-1]
@@ -31,7 +32,7 @@ def KMPSearch(pattern, txt):
                 i += 1
                 count = 0
         
-    return (maks / N * 100)
+    return None
 
 def computeLPSArray(pattern, M, lps):
     len = 0 # panjang prefix suffix terbesar sebelumnya
@@ -52,12 +53,12 @@ def computeLPSArray(pattern, M, lps):
                 lps[i] = 0
                 i += 1
 
-txt = "Siapa nama pembuat kode KMP?"
+'''txt = "Siapa nama pembuat kode KMP?"
 pattern1 = "pembuat"
-pattern2 = "nama"
+pattern2 = "kamu"
 result1 = KMPSearch(pattern1, txt)
 print(result1)
 result2 = KMPSearch(pattern2, txt)
-print(result1)
+print(result2)'''
 
 # Modifikasi program KMP by Bhavya Jain
