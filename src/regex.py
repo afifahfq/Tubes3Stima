@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from FileProcessing import *
 from KMP import *
 
-mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='', database='reminder')
+mysqldb = mysql.connector.connect(host='localhost', user='root',passwd='iyvlinriminis30', database='reminder')
 curs = mysqldb.cursor()
 #text = "Halo tolong dicatat ya matkul IF2230 ada tucil materi string matching 05 april 2021"
 
